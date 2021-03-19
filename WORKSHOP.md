@@ -1,6 +1,6 @@
 ### installing kpack 
 
-```
+```shell
 $ curl -LO https://github.com/pivotal/kpack/releases/download/v0.2.2/release-0.2.2.yaml
   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
                                  Dload  Upload   Total   Spent    Left  Speed
@@ -8,7 +8,7 @@ $ curl -LO https://github.com/pivotal/kpack/releases/download/v0.2.2/release-0.2
 100 13818  100 13818    0     0  26675      0 --:--:-- --:--:-- --:--:-- 26675
 ```
 
-```
+```shell
 $ kubectl get ns
 NAME              STATUS   AGE
 default           Active   17m
@@ -17,7 +17,7 @@ kube-public       Active   17m
 kube-system       Active   17m
 ```
 
-```
+```shell
 $ kubectl apply -f release-0.2.2.yaml 
 namespace/kpack created
 customresourcedefinition.apiextensions.k8s.io/builds.kpack.io created
@@ -53,7 +53,7 @@ clusterrole.rbac.authorization.k8s.io/kpack-webhook-mutatingwebhookconfiguration
 clusterrolebinding.rbac.authorization.k8s.io/kpack-webhook-certs-mutatingwebhookconfiguration-admin-binding created
 ```
 
-```
+```shell
 $ kubectl get crds
 NAME                       CREATED AT
 builders.kpack.io          2021-03-18T15:47:57Z
@@ -65,7 +65,7 @@ images.kpack.io            2021-03-18T15:47:57Z
 sourceresolvers.kpack.io   2021-03-18T15:47:57Z
 ```
 
-```
+```shell
 $ kubectl get all -n kpack
 NAME                                    READY   STATUS    RESTARTS   AGE
 pod/kpack-controller-6d7b8f49ff-85qjt   1/1     Running   0          71s
@@ -85,16 +85,16 @@ replicaset.apps/kpack-webhook-597484b97       1         1         1       72s
 
 ### verify docker login 
 
-```
+```shell
 $ eval $(minikube docker-env)
 ```
 
-```
+```shell
 $ DOCKER_USERNAME='replace with your docker id'
 $ DOCKER_PASSWORD='replace with your password'
 ```
 
-```
+```shell
 $ echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
 WARNING! Your password will be stored unencrypted in /Users/sschmidt/.docker/config.json.
 Configure a credential helper to remove this warning. See
@@ -105,7 +105,7 @@ Login Succeeded
 
 ### configure credentials for kpack 
 
-```
+```yaml
 $ cat dockerhub-registry-credentials.yaml
 apiVersion: v1
 kind: Secret
@@ -119,12 +119,12 @@ stringData:
   password: <password>
 ```
 
-```
+```shell
 $ kubectl apply -f dockerhub-registry-credentials.yaml 
 secret/dockerhub-registry-credentials created
 ```
 
-```
+```yaml
 $ cat dockerhub-service-account.yaml 
 apiVersion: v1
 kind: ServiceAccount
@@ -136,14 +136,14 @@ imagePullSecrets:
 - name: dockerhub-registry-credentials
 ```
 
-```
+```shell
 $ kubectl apply -f dockerhub-service-account.yaml 
 serviceaccount/dockerhub-service-account created
 ```
 
 ### configure the store 
 
-```
+```yaml
 $ cat store.yaml 
 apiVersion: kpack.io/v1alpha1
 kind: ClusterStore
@@ -161,25 +161,25 @@ spec:
   - image: gcr.io/paketo-buildpacks/nginx
 ```
 
-```
+```shell
 $ kubectl apply -f store.yaml 
 clusterstore.kpack.io/default created
 ```
 
-```
+```shell
 $ kubectl get clusterstore
 NAME                            READY
 clusterstore.kpack.io/default   True
 ```
 
-```
+```shell
 $ kubectl describe clusterstore
 ...
 ```
 
 ### configure the stack 
 
-```
+```yaml
 $ cat stack-1.0.24.yaml 
 apiVersion: kpack.io/v1alpha1
 kind: ClusterStack
@@ -193,25 +193,25 @@ spec:
     image: "paketobuildpacks/run:1.0.24-base-cnb"
 ```
 
-```
+```shell
 $ kubectl apply -f stack-1.0.24.yaml 
 clusterstack.kpack.io/base created
 ```
 
-```
+```shell
 $ kubectl get clusterstack
 NAME                         READY
 clusterstack.kpack.io/base   True
 ```
 
-```
+```shell
 $ kubectl describe clusterstack
 ...
 ```
 
 ### apply a builder 
 
-```
+```yaml
 $ cat builder.yaml 
 apiVersion: kpack.io/v1alpha1
 kind: Builder
@@ -244,23 +244,23 @@ spec:
     - id: paketo-buildpacks/nginx
 ```
 
-```
+```shell
 $ kubectl apply -f builder.yaml 
 builder.kpack.io/ws-builder created
 ```
 
-```
+```shell
 $ kubectl get builders
 NAME         LATESTIMAGE                                                                                                           READY
 ws-builder   index.docker.io/demosteveschmidt/ws-builder@sha256:2eb02b27cfc308295b8923c5b93447c0072f1749ea89fd22e5554ee53624d3b2   True
 ```
 
-```
+```shell
 $ kubectl describe builder ws-builder
 ...
 ```
 
-```
+```shell
 $ curl -s -S 'https://registry.hub.docker.com/v2/repositories/demosteveschmidt/' | jq .
 {
 ...
@@ -279,7 +279,7 @@ The "fork" button is on the upper right hand corner, just below the bell in top 
 
 ### define the petclinic image build 
 
-```
+```shell
 $ cat dockerhub-image.yaml 
 apiVersion: kpack.io/v1alpha1
 kind: Image
@@ -298,51 +298,51 @@ spec:
       revision: e2fbc561309d03d92a0958f3cf59219b1fc0d985
 ```
 
-```
+```shell
 $ kubectl apply -f dockerhub-image.yaml 
 image.kpack.io/petclinic-image created
 ```
 
-```
+```shell
 $ kubectl get pods
 NAME                                      READY   STATUS     RESTARTS   AGE
 petclinic-image-build-1-bh9r4-build-pod   0/1     Init:1/6   0          14s
 ```
 
-```
+```shell
 $ kubectl get image
 NAME              LATESTIMAGE   READY
 petclinic-image                 Unknown
 ```
 
-```
+```shell
 $ kubectl get build
 NAME                            IMAGE   SUCCEEDED
 petclinic-image-build-1-bh9r4           Unknown
 ```
 
-```
+```shell
 $ kubectl get pods
 NAME                                      READY   STATUS     RESTARTS   AGE
 petclinic-image-build-1-bh9r4-build-pod   0/1     Init:4/6   0          3m8s
 ```
 
-```
+```shell
 $ kubectl logs petclinic-image-build-1-bh9r4-build-pod -c build -f
 ```
 
-```
+```shell
 $ kubectl get pods
 NAME                                      READY   STATUS      RESTARTS   AGE
 petclinic-image-build-1-bh9r4-build-pod   0/1     Completed   0          9m7s
 ```
 
-```
+```shell
 $ ./logs.sh petclinic-image-build-1-bh9r4-build-pod > build-output.txt
 $ cat build-output.txt
 ```
 
-```
+```shell
 $ curl -s -S 'https://registry.hub.docker.com/v2/repositories/demosteveschmidt/' | jq .
 ...
       "user": "demosteveschmidt",
