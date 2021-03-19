@@ -279,7 +279,7 @@ The "fork" button is on the upper right hand corner, just below the bell in top 
 
 ### define the petclinic image build 
 
-```shell
+```yaml
 $ cat dockerhub-image.yaml 
 apiVersion: kpack.io/v1alpha1
 kind: Image
