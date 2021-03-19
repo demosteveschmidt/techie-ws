@@ -1,5 +1,7 @@
 # Cloud Native Buildpacks
 
+<img src=https://buildpacks.io/images/buildpacks-logo.svg width=200>
+
 A subset of the information from the CNB website is reproduced here to cover the main concepts and terms.
 https://buildpacks.io/docs/concepts/
 
