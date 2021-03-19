@@ -1,5 +1,13 @@
 # Cloud Native Buildpacks
 
+### What are Cloud Natvie Buildpacks?
+
+CNB for short turn your code into OCI-compliant containers. They examine your source code, build it, and create a container image with all the required dependencies to run your application.
+
+Language family buildpacks exist for Java, Java Native Image, Node.js, Go, Ruby, PHP, .Net Core, HTTPD, NGINX and more.
+
+### Concepts and terms
+
 <img src=https://buildpacks.io/images/buildpacks-logo.svg width=200>
 
 A subset of the information from the CNB website is reproduced here to cover the main concepts and terms.
