@@ -1,5 +1,6 @@
-# techie-ws
-test ideas for the techie ws
+# Techie Workshop
+
+Test ideas for the technical workshop on April 21st
 
 ### General Notes
 
