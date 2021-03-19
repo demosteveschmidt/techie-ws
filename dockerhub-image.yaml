@@ -1,0 +1,15 @@
+apiVersion: kpack.io/v1alpha1
+kind: Image
+metadata:
+  name: petclinic-image
+  namespace: default
+spec:
+  tag: index.docker.io/demosteveschmidt/petclinic
+  serviceAccount: dockerhub-service-account
+  builder:
+    name: ws-builder
+    kind: Builder
+  source:
+    git:
+      url: https://github.com/demosteveschmidt/spring-petclinic
+      revision: e2fbc561309d03d92a0958f3cf59219b1fc0d985
