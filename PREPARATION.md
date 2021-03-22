@@ -18,12 +18,14 @@ We will use your new docker id and password to log in and push / pull images.
 
 ### CLI tools to install
 
+A note on the versions. These are the ones I tested on my Mac. Higher versions should work as long as they are backwards compatible.
+
 Verify that you have the following tools handy on your system:
-- minikube
-- kubectl
-- curl
-- git
-- jq
+- minikube version: v1.17.1
+- kubectl version: v1.20.2
+- curl version: 7.64.1
+- git version: 2.29.2
+- jq version: jq-1.6
 
 ### Setup the minikube cluster
 
