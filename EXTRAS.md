@@ -133,9 +133,7 @@ petclinic-image-build-3-lkfm9-build-pod   0/1     Init:Error   0          2m30s
 petclinic-image-build-4-jcrmz-build-pod   0/1     Completed    0          2m9s
 ```
 
-```
 We now have **much faster builds** since all the dependencies are cached.
-
 
 ```
 $ ./logs.sh petclinic-image-build-4-jcrmz-build-pod > build-output-2.txt 
