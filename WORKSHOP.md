@@ -1,3 +1,7 @@
+# Hands-on Workshop
+
+<img src=./images/WorkshopOverview.png>
+
 ### installing kpack 
 
 ```shell
