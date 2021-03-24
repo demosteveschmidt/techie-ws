@@ -1,0 +1,15 @@
+apiVersion: kpack.io/v1alpha1
+kind: Image
+metadata:
+  name: hello-node
+  namespace: default
+spec:
+  tag: index.docker.io/demosteveschmidt/cnb-hello-node
+  serviceAccount: dockerhub-service-account
+  builder:
+    name: ws-builder
+    kind: Builder
+  source:
+    git:
+      url: https://github.com/demosteveschmidt/node
+      revision: main

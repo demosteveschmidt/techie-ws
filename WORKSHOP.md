@@ -2,7 +2,7 @@
 
 <img src=./images/WorkshopOverview.png>
 
-### installing kpack 
+### installing kpack
 
 ```shell
 $ curl -LO https://github.com/pivotal/kpack/releases/download/v0.2.2/release-0.2.2.yaml
@@ -22,7 +22,7 @@ kube-system       Active   17m
 ```
 
 ```shell
-$ kubectl apply -f release-0.2.2.yaml 
+$ kubectl apply -f release-0.2.2.yaml
 namespace/kpack created
 customresourcedefinition.apiextensions.k8s.io/builds.kpack.io created
 customresourcedefinition.apiextensions.k8s.io/builders.kpack.io created
@@ -87,7 +87,7 @@ replicaset.apps/kpack-controller-6d7b8f49ff   1         1         1       72s
 replicaset.apps/kpack-webhook-597484b97       1         1         1       72s
 ```
 
-### verify docker login 
+### verify docker login
 
 ```shell
 $ eval $(minikube docker-env)
@@ -107,7 +107,7 @@ https://docs.docker.com/engine/reference/commandline/login/#credentials-store
 Login Succeeded
 ```
 
-### configure credentials for kpack 
+### configure credentials for kpack
 
 ```yaml
 $ cat dockerhub-registry-credentials.yaml
@@ -124,12 +124,12 @@ stringData:
 ```
 
 ```shell
-$ kubectl apply -f dockerhub-registry-credentials.yaml 
+$ kubectl apply -f dockerhub-registry-credentials.yaml
 secret/dockerhub-registry-credentials created
 ```
 
 ```yaml
-$ cat dockerhub-service-account.yaml 
+$ cat dockerhub-service-account.yaml
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -141,14 +141,14 @@ imagePullSecrets:
 ```
 
 ```shell
-$ kubectl apply -f dockerhub-service-account.yaml 
+$ kubectl apply -f dockerhub-service-account.yaml
 serviceaccount/dockerhub-service-account created
 ```
 
-### configure the store 
+### configure the store
 
 ```yaml
-$ cat store.yaml 
+$ cat store.yaml
 apiVersion: kpack.io/v1alpha1
 kind: ClusterStore
 metadata:
@@ -166,7 +166,7 @@ spec:
 ```
 
 ```shell
-$ kubectl apply -f store.yaml 
+$ kubectl apply -f store.yaml
 clusterstore.kpack.io/default created
 ```
 
@@ -181,10 +181,10 @@ $ kubectl describe clusterstore
 ...
 ```
 
-### configure the stack 
+### configure the stack
 
 ```yaml
-$ cat stack-1.0.24.yaml 
+$ cat stack-1.0.24.yaml
 apiVersion: kpack.io/v1alpha1
 kind: ClusterStack
 metadata:
@@ -198,7 +198,7 @@ spec:
 ```
 
 ```shell
-$ kubectl apply -f stack-1.0.24.yaml 
+$ kubectl apply -f stack-1.0.24.yaml
 clusterstack.kpack.io/base created
 ```
 
@@ -213,10 +213,94 @@ $ kubectl describe clusterstack
 ...
 ```
 
-### apply a builder 
+### create a builder for nodejs
 
 ```yaml
-$ cat builder.yaml 
+$ cat builder.yaml
+apiVersion: kpack.io/v1alpha1
+kind: Builder
+metadata:
+  name: ws-builder
+  namespace: default
+spec:
+  serviceAccount: dockerhub-service-account
+  tag: index.docker.io/demosteveschmidt/ws-builder
+  stack:
+    name: base
+    kind: ClusterStack
+  store:
+    name: default
+    kind: ClusterStore
+  order:
+  - group:
+    - id: paketo-buildpacks/nodejs
+```
+
+
+### examine the objects and the builder image
+
+```shell
+$ kubectl apply -f builder.yaml
+builder.kpack.io/ws-builder created
+```
+
+```shell
+$ kubectl get builders
+NAME         LATESTIMAGE                                                                                                           READY
+ws-builder   index.docker.io/demosteveschmidt/ws-builder@sha256:2eb02b27cfc308295b8923c5b93447c0072f1749ea89fd22e5554ee53624d3b2   True
+```
+
+```shell
+$ kubectl describe builder ws-builder
+...
+```
+
+```shell
+$ curl -s -S 'https://registry.hub.docker.com/v2/repositories/demosteveschmidt/' | jq .
+{
+...
+    {
+      "user": "demosteveschmidt",
+      "name": "ws-builder",
+...
+```
+
+### define the image for nodejs
+
+```yaml
+apiVersion: kpack.io/v1alpha1
+kind: Image
+metadata:
+  name: hello-node
+  namespace: default
+spec:
+  tag: index.docker.io/<YOUR_DOCKER_USERNAME>/cnb-hello-node
+  serviceAccount: dockerhub-service-account
+  builder:
+    name: ws-builder
+    kind: Builder
+  source:
+    git:
+      url: https://github.com/demosteveschmidt/node
+      revision: main
+```
+
+### deploy the image and test it
+
+```shell
+$ kubectl create deployment cnb-hello-node --image=demosteveschmidt/cnb-hello-node
+$ kubectl expose deployment/cnb-hello-node --port 8080 --type LoadBalancer
+$ minikube service cnb-hello-node
+```
+
+### configure another builds
+
+We will now modify the builder to cover many more languages and frameworks like Spring Boot Java. Then we configure an image for the world famous Spring Petclinic application.
+
+### update the builder to include java and other buildpacks
+
+```yaml
+$ cat builder.yaml
 apiVersion: kpack.io/v1alpha1
 kind: Builder
 metadata:
@@ -249,42 +333,27 @@ spec:
 ```
 
 ```shell
-$ kubectl apply -f builder.yaml 
-builder.kpack.io/ws-builder created
+$ kubectl apply -f builder.yaml
+builder.kpack.io/ws-builder updated
 ```
 
 ```shell
-$ kubectl get builders
-NAME         LATESTIMAGE                                                                                                           READY
-ws-builder   index.docker.io/demosteveschmidt/ws-builder@sha256:2eb02b27cfc308295b8923c5b93447c0072f1749ea89fd22e5554ee53624d3b2   True
-```
-
-```shell
-$ kubectl describe builder ws-builder
-...
-```
-
-```shell
-$ curl -s -S 'https://registry.hub.docker.com/v2/repositories/demosteveschmidt/' | jq .
+$ curl -s -S 'https://registry.hub.docker.com/v2/repositories/demosteveschmidt/ws-builder/tags/' | jq .
 {
-...
-    {
-      "user": "demosteveschmidt",
-      "name": "ws-builder",
+  "count": 2,
 ...
 ```
 
-
-### fork spring petclinic 
+### fork spring petclinic
 
 https://github.com/demosteveschmidt/spring-petclinic
 The "fork" button is on the upper right hand corner, just below the bell in top bar.
 
 
-### define the petclinic image build 
+### define the petclinic image build
 
 ```yaml
-$ cat dockerhub-image.yaml 
+$ cat dockerhub-image.yaml
 apiVersion: kpack.io/v1alpha1
 kind: Image
 metadata:
@@ -303,7 +372,7 @@ spec:
 ```
 
 ```shell
-$ kubectl apply -f dockerhub-image.yaml 
+$ kubectl apply -f dockerhub-image.yaml
 image.kpack.io/petclinic-image created
 ```
 
