@@ -2,6 +2,17 @@
 
 Test ideas for the technical workshop on April 21st
 
+## Cloud Native Buildpacks Hands-on
+
+These are the documents for the CNB workshop
+
+### Outline
+
+[Preparation - before the workshop](./PREPARATION.md)
+[Introduction to Cloud Native Buildpacks](./INTRO.md)
+[CNB Workshop overview and content](./WORKSHOP.md)
+[Extras (after completing the workshop)](./EXTRAS.md)
+
 ### General Notes
 
 To troubleshoot YAML file issues, run the following in `vi`
