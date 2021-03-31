@@ -8,10 +8,10 @@ These are the documents for the CNB workshop
 
 ### Outline
 
-[Preparation - before the workshop](./PREPARATION.md)
-[Introduction to Cloud Native Buildpacks](./INTRO.md)
-[CNB Workshop overview and content](./WORKSHOP.md)
-[Extras (after completing the workshop)](./EXTRAS.md)
+* [Preparation - before the workshop](./PREPARATION.md)
+* [Introduction to Cloud Native Buildpacks](./INTRO.md)
+* [CNB Workshop overview and content](./WORKSHOP.md)
+* [Extras (after completing the workshop)](./EXTRAS.md)
 
 ### General Notes
 
