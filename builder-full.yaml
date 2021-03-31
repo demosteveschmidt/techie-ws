@@ -14,4 +14,16 @@ spec:
     kind: ClusterStore
   order:
   - group:
+    - id: paketo-buildpacks/java
+  - group:
+    - id: paketo-buildpacks/java-azure
+  - group:
+    - id: paketo-buildpacks/graalvm
+  - group:
     - id: paketo-buildpacks/nodejs
+  - group:
+    - id: paketo-buildpacks/dotnet-core
+  - group:
+    - id: paketo-buildpacks/go
+  - group:
+    - id: paketo-buildpacks/nginx
