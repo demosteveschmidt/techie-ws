@@ -89,7 +89,7 @@ replicaset.apps/hello-server-76d47868b4   1         1         1       98s
 
 The next step should open up your browser and display the hello-server text.
 ```
-$ minikube service hello-server
+$ minikube -p cnb service hello-server
 |-----------|--------------|-------------|---------------------------|
 | NAMESPACE |     NAME     | TARGET PORT |            URL            |
 |-----------|--------------|-------------|---------------------------|
