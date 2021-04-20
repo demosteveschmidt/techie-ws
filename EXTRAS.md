@@ -60,6 +60,7 @@ NAME              LATESTIMAGE                                                   
 petclinic-image   index.docker.io/demosteveschmidt/petclinic@sha256:0f966338f29facb1c19067f81bf376b0a9597da72a8c6860fe748cf5d9522016   True
 ```
 
+When we look at the steps this build completed we see just rebase.
 ```
 $ kubectl describe build petclinic-image-build-2-xnpr6
 ...
@@ -67,11 +68,13 @@ $ kubectl describe build petclinic-image-build-2-xnpr6
     rebase
 ```
 
+And now we take a look at the reason for the build when we changed the base image.
 ```
-$ kubectl describe build petclinic-image-build-1-bh9r4 | grep " image.kpack.io/reason"
-              image.kpack.io/reason: CONFIG
+$ kubectl describe build petclinic-image-build-2-xnpr6 | grep " image.kpack.io/reason"
+              image.kpack.io/reason: STACK
 ```
 
+Compare this to the first build when we defined the image.
 ```
 $ kubectl describe build petclinic-image-build-1-bh9r4
 ...
@@ -84,13 +87,16 @@ $ kubectl describe build petclinic-image-build-1-bh9r4
     export
 ```
 
+Let's see the reason for the build was then.
 ```
-$ kubectl describe build petclinic-image-build-2-xnpr6 | grep " image.kpack.io/reason"
-              image.kpack.io/reason: STACK
+$ kubectl describe build petclinic-image-build-1-bh9r4 | grep " image.kpack.io/reason"
+              image.kpack.io/reason: CONFIG
 ```
-
 
 ### Rebuild on commit
+
+We will update the image definition for the petclinic-image and change from a `commit sha` to the `main` branch.
+After this change, every commit to the main branch will trigger a new build.
 
 ```
 $ cat dockerhub-image-main.yaml 
@@ -185,6 +191,18 @@ $ curl -s -S 'https://registry.hub.docker.com/v2/repositories/demosteveschmidt/p
       "name": "b2.20210318.175858",
       "name": "b1.20210318.172935",
 ```
+
+The easiest way to see your updated image with the new message is to edit the deployment and change the image name to your latest image including the tag.
+Kubernetes will spin up a new pod with that image.
+
+```
+$ kubectl edit deployment petclinic
+...
+      - image: index.docker.io/demosteveschmidt/petclinic:b5.20210318.182152
+...
+```
+
+Wait until the pod is running, then refresh your browser tab for petclinic.
 
 ### Congratulations!
 
