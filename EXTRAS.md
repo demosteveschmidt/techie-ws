@@ -1,6 +1,12 @@
-### rebase the image
+# Extra Labs
 
-We do so by patching the run image.
+1. Rebasing an image without application changes
+2. Rebuilding on source code commit
+
+### Rebase the image
+
+Rebasing can be done without building a new application artifact. When we change the run image in the stack, this will trigger a rebuild for every image using any language. No more guessing or hunting around for affected images.
+When we initially wrote the stack.yaml, we specified an older version `1.0.24` on purpose. We will now remove the version which will cause the latest image to be used.
 
 ```
 $ cat stack-latest.yaml 
@@ -26,6 +32,10 @@ $ diff stack.yaml stack-latest.yaml
 <     image: "paketobuildpacks/run:1.0.24-base-cnb"
 ---
 >     image: "paketobuildpacks/run:base-cnb"
+```
+
+```shell
+$ kubectl apply -f stack-latest.yaml
 ```
 
 ```
@@ -80,7 +90,7 @@ $ kubectl describe build petclinic-image-build-2-xnpr6 | grep " image.kpack.io/r
 ```
 
 
-### rebuild on commit
+### Rebuild on commit
 
 ```
 $ cat dockerhub-image-main.yaml 
@@ -140,7 +150,7 @@ $ ./logs.sh petclinic-image-build-4-jcrmz-build-pod > build-output-2.txt
 $ cat build-output-2.txt
 ```
 
-### change source code
+### Change source code
 
 On Github on your own fork of spring-petclinic, navigate to the to the application.properties file. Update the welcome message to your liking.
 `spring-petclinic/src/main/resources/messages/messages.properties`
@@ -176,4 +186,8 @@ $ curl -s -S 'https://registry.hub.docker.com/v2/repositories/demosteveschmidt/p
       "name": "b1.20210318.172935",
 ```
 
+### Congratulations!
 
+Hey! You made it through the workshop AND the extras. 
+I hope you had fun and gained a good overview of buildpacks and kpack.
+For more information and guides head over to tanzu.vmware.com/developer
