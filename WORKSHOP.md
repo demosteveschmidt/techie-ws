@@ -234,7 +234,7 @@ spec:
 ```
 
 ```shell
-$ kubectl apply -f stack-1.0.24.yaml
+$ kubectl apply -f stack.yaml
 clusterstack.kpack.io/base created
 ```
 
@@ -358,7 +358,68 @@ spec:
       revision: main
 ```
 
-# TODO: watch the image, build, logs (as with the petclinic image below)
+### Define the image
+
+This will create the image definition for kpack and trigger a build
+
+```shell
+$ kubectl apply -f dockerhub-image-node.yaml
+image.kpack.io/hello-node created
+```
+
+### Create a helper to watch the logs
+
+```shell
+$ cat logs.sh
+#!/bin/bash
+
+if [ "$1" == "" ]
+then
+  echo "usage: $0 image-build-pod-name"
+  exit 1
+fi
+
+BLUE="\033[0;36m"; NORM="\033[0m"
+
+POD="$1"
+
+CONTAINERS=$(kubectl get pod $POD -o json | jq ".spec.initContainers[].name" | tr -d '"')
+
+for container in $CONTAINERS completion
+do
+  echo ""; echo -e "${BLUE}---- $container ----${NORM}"; echo ""
+  kubectl logs $POD -c $container -f
+  if [ $container != "completion" ]
+  then
+    read -p "[Enter to continue]" ans
+  fi
+done
+```
+
+Make it runnable
+
+```shell
+$ chmod 755 logs.sh
+```
+
+### Display the build pod, image status and logs
+
+```shell
+$ kubectl get pods
+NAME                                     READY   STATUS     RESTARTS   AGE
+pod/hello-node-build-1-69sdm-build-pod   0/1     Init:1/6   0          27s
+$ kubectl describe image
+...
+  Latest Build Reason:            CONFIG
+  Latest Build Ref:               hello-node-build-1-69sdm
+  Latest Image:                   index.docker.io/demosteveschmidt/cnb-hello-node@sha256:ad90f528a5b2e0799a99517d817135fa9703905471c955a640340257f64300e8
+...
+```
+
+```shell
+$ ./logs.sh hello-node-build-1-69sdm-build-pod
+...
+```
 
 ### Deploy the image and test it
 
