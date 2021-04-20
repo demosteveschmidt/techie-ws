@@ -424,7 +424,7 @@ $ ./logs.sh hello-node-build-1-69sdm-build-pod
 ### Deploy the image and test it
 
 ```shell
-$ kubectl create deployment cnb-hello-node --image=demosteveschmidt/cnb-hello-node
+$ kubectl create deployment cnb-hello-node --image=<DOCKER_USERNAME>/cnb-hello-node
 $ kubectl expose deployment/cnb-hello-node --port 8080 --type LoadBalancer
 $ minikube service cnb-hello-node
 ```
@@ -495,7 +495,7 @@ builder.kpack.io/ws-builder updated
 ```
 
 ```shell
-$ curl -s -S 'https://registry.hub.docker.com/v2/repositories/demosteveschmidt/ws-builder/tags/' | jq .
+$ curl -s -S 'https://registry.hub.docker.com/v2/repositories/<DOCKER_USERNAME>/ws-builder/tags/' | jq .
 {
   "count": 2,
 ...
