@@ -6,7 +6,7 @@
 ### Rebase the image
 
 Rebasing can be done without building a new application artifact. When we change the run image in the stack, this will trigger a rebuild for every image using any language. No more guessing or hunting around for affected images.
-When we initially wrote the stack.yaml, we specified an older version `1.0.24` on purpose. We will now remove the version which will cause the latest image to be used.
+When we initially wrote the stack.yaml, we specified an older version `1.1.20` on purpose. We will now remove the version which will cause the latest image to be used.
 
 ```
 $ cat stack-latest.yaml 
@@ -25,11 +25,11 @@ spec:
 ```
 $ diff stack.yaml stack-latest.yaml 
 8c8
-<     image: "paketobuildpacks/build:1.0.24-base-cnb"
+<     image: "paketobuildpacks/build:1.1.20-base-cnb"
 ---
 >     image: "paketobuildpacks/build:base-cnb"
 10c10
-<     image: "paketobuildpacks/run:1.0.24-base-cnb"
+<     image: "paketobuildpacks/run:1.1.20-base-cnb"
 ---
 >     image: "paketobuildpacks/run:base-cnb"
 ```
@@ -44,7 +44,7 @@ NAME                            IMAGE                                           
 petclinic-image-build-1-bh9r4   index.docker.io/demosteveschmidt/petclinic@sha256:acb0f840391ab9072b3a6ffd6263e1f2bde3f34a42fedbe7e1da0d4c74be6e77   True
 petclinic-image-build-2-xnpr6                                                                                                                        Unknown
 ```
-After a short while
+After a short while you should see the build for petclinic starting. If you still have the hello-node image defined, this will start a new build as well.
 
 ```
 $ kubectl get builds
@@ -96,7 +96,8 @@ $ kubectl describe build petclinic-image-build-1-bh9r4 | grep " image.kpack.io/r
 ### Rebuild on commit
 
 We will update the image definition for the petclinic-image and change from a `commit sha` to the `main` branch.
-After this change, every commit to the main branch will trigger a new build.
+After this change, every commit to the main branch will trigger a new build. Make sure to change the tag: and url: lines
+to your values.
 
 ```
 $ cat dockerhub-image-main.yaml 
@@ -116,6 +117,14 @@ spec:
       url: https://github.com/demosteveschmidt/spring-petclinic
       revision: main
 ```
+
+Apply the changes to the petclinic build image
+
+```
+$ kubectl apply -f dockerhub-image-main.yaml
+```
+
+This will start a new build as we changed the image definition
 
 ```
 $ kubectl get builds
@@ -158,11 +167,11 @@ $ cat build-output-2.txt
 
 ### Change source code
 
-On Github on your own fork of spring-petclinic, navigate to the to the application.properties file. Update the welcome message to your liking.
+On Github on your own fork of spring-petclinic, navigate to the application.properties file. Update the welcome message to your liking.
 `spring-petclinic/src/main/resources/messages/messages.properties`
 
 ```
-welcome=Techie Workshop Rocks! Apr 21st 2021
+welcome=Techie Workshop Rocks! Sep 14th 2021
 ```
 
 ```
@@ -192,7 +201,7 @@ $ curl -s -S 'https://registry.hub.docker.com/v2/repositories/demosteveschmidt/p
       "name": "b1.20210318.172935",
 ```
 
-The easiest way to see your updated image with the new message is to edit the deployment and change the image name to your latest image including the tag.
+A good practice in Kubernetes is to refer to the image includig a tag or a sha. To see your updated image with the new message, edit the deployment and change the image name to your latest image including the tag.
 Kubernetes will spin up a new pod with that image.
 
 ```

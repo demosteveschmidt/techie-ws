@@ -12,7 +12,7 @@
 ## Installing kpack
 
 ```shell
-$ curl -LO https://github.com/pivotal/kpack/releases/download/v0.2.2/release-0.2.2.yaml
+$ curl -LO https://github.com/pivotal/kpack/releases/download/v0.3.0/release-0.3.0.yaml
   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
                                  Dload  Upload   Total   Spent    Left  Speed
 100   626  100   626    0     0   2196      0 --:--:-- --:--:-- --:--:--  2196
@@ -29,7 +29,7 @@ kube-system       Active   17m
 ```
 
 ```shell
-$ kubectl apply -f release-0.2.2.yaml
+$ kubectl apply -f release-0.3.0.yaml
 namespace/kpack created
 customresourcedefinition.apiextensions.k8s.io/builds.kpack.io created
 customresourcedefinition.apiextensions.k8s.io/builders.kpack.io created
@@ -605,6 +605,15 @@ $ curl -s -S 'https://registry.hub.docker.com/v2/repositories/<DOCKER_USERNAME>/
       "user": "demosteveschmidt",
       "name": "petclinic",
 ...
+```
+
+
+### Deploy the petclinic image and test it
+
+```shell
+$ kubectl create deployment petclinic --image=<DOCKER_USERNAME>/petclinic
+$ kubectl expose deployment/petclinic --port 8080 --type LoadBalancer
+$ minikube service petclinic
 ```
 
 __All done for the MAIN part of the workshop__

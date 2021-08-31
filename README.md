@@ -1,6 +1,7 @@
 # Techie Workshop
 
-Test ideas for the technical workshop on April 21st
+Hands-on lab for the technical workshop on April 21st 2021.
+Updated for the workshop on Sep 14th 2021.
 
 ## Cloud Native Buildpacks Hands-on
 
